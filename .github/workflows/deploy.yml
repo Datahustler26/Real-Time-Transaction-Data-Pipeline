@@ -1,16 +1,13 @@
 # ============================================
 # CD Pipeline - Deploy to Production
 # ============================================
+# This workflow only runs on manual dispatch.
+# Configure AWS secrets before using:
+#   AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AIRFLOW_S3_BUCKET
+# ============================================
 name: Deploy Pipeline
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'dags/**'
-      - 'sql/**'
-      - 'lambdas/**'
-
   workflow_dispatch:
     inputs:
       environment:
@@ -101,5 +98,5 @@ jobs:
           curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
             -H 'Content-type: application/json' \
             -d '{
-              "text": "✅ Pipeline deployed to ${{ github.event.inputs.environment || 'staging' }} (commit: ${{ github.sha }})"
+              "text": "Pipeline deployed to ${{ github.event.inputs.environment || 'staging' }} (commit: ${{ github.sha }})"
             }'
