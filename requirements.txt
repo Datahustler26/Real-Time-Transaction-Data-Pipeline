@@ -1,0 +1,51 @@
+# ============================================
+# Transaction Data Pipeline - Python Dependencies
+# ============================================
+
+# --- Core Orchestration ---
+apache-airflow==2.7.3
+apache-airflow-providers-snowflake==5.1.1
+apache-airflow-providers-slack==8.0.0
+apache-airflow-providers-amazon==8.10.0
+
+# --- Data Warehouse ---
+snowflake-connector-python==3.5.0
+snowflake-sqlalchemy==1.5.1
+
+# --- Data Quality ---
+great-expectations==0.18.8
+
+# --- AWS ---
+boto3==1.34.14
+botocore==1.34.14
+
+# --- Monitoring ---
+prometheus-client==0.19.0
+
+# --- Data Processing ---
+pandas==2.1.4
+numpy==1.26.2
+pyarrow==14.0.1
+
+# --- HTTP / Notifications ---
+requests==2.31.0
+slack-sdk==3.26.1
+
+# --- Utilities ---
+python-dotenv==1.0.0
+pyyaml==6.0.1
+cryptography==41.0.7
+pydantic==2.5.3
+
+# --- Testing ---
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+faker==21.0.0
+moto[s3]==4.2.12
+
+# --- Code Quality ---
+flake8==6.1.0
+black==23.12.1
+isort==5.13.2
+mypy==1.8.0

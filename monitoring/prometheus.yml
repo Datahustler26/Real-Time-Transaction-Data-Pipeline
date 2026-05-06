@@ -1,0 +1,53 @@
+# ============================================
+# Prometheus Configuration
+# ============================================
+# Scrapes Airflow metrics (via StatsD exporter) and
+# custom pipeline metrics endpoints.
+# ============================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+# Alerting rules (optional — add Alertmanager for production)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+# rule_files:
+#   - "/etc/prometheus/rules/*.yml"
+
+scrape_configs:
+  # --- Prometheus self-monitoring ---
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          environment: 'pipeline'
+
+  # --- Airflow StatsD Exporter ---
+  - job_name: 'airflow'
+    static_configs:
+      - targets: ['statsd-exporter:9102']
+        labels:
+          service: 'airflow'
+          environment: 'pipeline'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'airflow_(.*)'
+        target_label: __name__
+        replacement: 'airflow_${1}'
+
+  # --- Custom Pipeline Metrics ---
+  # Pushgateway for batch job metrics
+  # - job_name: 'pushgateway'
+  #   honor_labels: true
+  #   static_configs:
+  #     - targets: ['pushgateway:9091']
+
+  # --- Node Exporter (host metrics) ---
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']

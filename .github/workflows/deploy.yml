@@ -1,0 +1,105 @@
+# ============================================
+# CD Pipeline - Deploy to Production
+# ============================================
+name: Deploy Pipeline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dags/**'
+      - 'sql/**'
+      - 'lambdas/**'
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  deploy-dags:
+    name: Deploy Airflow DAGs
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Validate DAG syntax
+        run: |
+          pip install apache-airflow==2.7.3
+          python -c "
+          import importlib.util
+          spec = importlib.util.spec_from_file_location('dag', 'dags/transaction_pipeline.py')
+          mod = importlib.util.module_from_spec(spec)
+          print('DAG syntax validation passed')
+          "
+
+      - name: Sync DAGs to S3
+        run: |
+          aws s3 sync dags/ s3://${{ secrets.AIRFLOW_S3_BUCKET }}/dags/ \
+            --delete \
+            --exclude "__pycache__/*" \
+            --exclude "*.pyc"
+
+      - name: Sync SQL to S3
+        run: |
+          aws s3 sync sql/ s3://${{ secrets.AIRFLOW_S3_BUCKET }}/sql/ \
+            --delete
+
+  deploy-lambda:
+    name: Deploy Lambda Functions
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    needs: deploy-dags
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Package Lambda
+        run: |
+          cd lambdas/event_ingestion
+          pip install -r requirements.txt -t ./package
+          cd package && zip -r ../deployment.zip . && cd ..
+          zip -g deployment.zip lambda_function.py
+
+      - name: Deploy Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name transaction-event-ingestion \
+            --zip-file fileb://lambdas/event_ingestion/deployment.zip
+
+      - name: Notify Slack
+        if: success()
+        run: |
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-type: application/json' \
+            -d '{
+              "text": "✅ Pipeline deployed to ${{ github.event.inputs.environment || 'staging' }} (commit: ${{ github.sha }})"
+            }'

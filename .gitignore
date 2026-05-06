@@ -1,0 +1,75 @@
+# ============================================
+# .gitignore - Transaction Data Pipeline
+# ============================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Virtual Environment ---
+venv/
+env/
+.venv/
+.env
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# --- Airflow ---
+logs/
+airflow.db
+airflow.cfg
+webserver_config.py
+airflow-webserver.pid
+
+# --- Docker ---
+docker-compose.override.yml
+
+# --- Testing ---
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# --- Data ---
+*.csv
+!tests/fixtures/sample_transactions.csv
+*.parquet
+*.json.gz
+data/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- Secrets ---
+.env
+*.pem
+*.key
+credentials.json
+
+# --- Great Expectations ---
+great_expectations/uncommitted/
+great_expectations/checkpoints/
+great_expectations/.ge_store_backend_id
+
+# --- Jupyter ---
+.ipynb_checkpoints/
