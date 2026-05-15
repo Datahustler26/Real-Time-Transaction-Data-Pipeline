@@ -102,7 +102,7 @@ def generate_transaction(record_id: int, base_time: datetime) -> dict:
     response_code = RESPONSE_CODES.get(status, "00")
     if isinstance(response_code, list):
         response_code = random.choice(response_code)
-    
+
     return {
         "transaction_id": f"TXN_{uuid.uuid4().hex[:12].upper()}",
         "customer_id": customer,
