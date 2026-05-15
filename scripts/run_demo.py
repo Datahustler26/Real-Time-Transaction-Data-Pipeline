@@ -142,7 +142,7 @@ def main():
         }
         result = lambda_handler(test_event, None)
         body = json.loads(result["body"])
-        print(f"  Test 1 - Single event:")
+        print("  Test 1 - Single event:")
         print(f"    Status: {result['statusCode']}")
         print(f"    Processed: {body['processed']}, Failed: {body['failed']}")
         print(f"    Latency: {body['duration_ms']}ms")
@@ -163,7 +163,7 @@ def main():
         batch_event = {"body": json.dumps(batch_events)}
         result2 = lambda_handler(batch_event, None)
         body2 = json.loads(result2["body"])
-        print(f"  Test 2 - Batch (50 events):")
+        print("  Test 2 - Batch (50 events):")
         print(f"    Status: {result2['statusCode']}")
         print(f"    Processed: {body2['processed']}, Failed: {body2['failed']}")
         print(f"    Latency: {body2['duration_ms']}ms")
@@ -180,7 +180,7 @@ def main():
         }
         result3 = lambda_handler(bad_event, None)
         body3 = json.loads(result3["body"])
-        print(f"  Test 3 - Invalid event (negative amount):")
+        print("  Test 3 - Invalid event (negative amount):")
         print(f"    Status: {result3['statusCode']}")
         print(f"    Failed: {body3['failed']}")
         if body3.get("errors"):
@@ -198,7 +198,7 @@ def main():
         }
         result4 = lambda_handler(bad_event2, None)
         body4 = json.loads(result4["body"])
-        print(f"  Test 4 - Invalid currency:")
+        print("  Test 4 - Invalid currency:")
         print(f"    Status: {result4['statusCode']}")
         print(f"    Failed: {body4['failed']}")
         if body4.get("errors"):
@@ -232,10 +232,10 @@ def main():
     # ---- Summary ----
     separator("DEMO COMPLETE - All Components Working!")
 
-    print(f"  Data Generated:   10,000 transactions + 200 customers")
+    print("  Data Generated:   10,000 transactions + 200 customers")
     print(f"  Quality Checks:   {passed}/{len(results)} passed")
     print(f"  Lambda Tests:     {lambda_tests}")
-    print(f"  Config:           Validated")
+    print("  Config:           Validated")
     print()
     print("  To run full stack with Docker:")
     print("    1. Install Docker Desktop: https://docker.com")

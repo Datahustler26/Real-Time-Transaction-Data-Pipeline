@@ -221,7 +221,7 @@ def main():
 
     print()
     print("Test data generation complete!")
-    print(f"   Load into Snowflake with: COPY INTO ... FROM @stage")
+    print("   Load into Snowflake with: COPY INTO ... FROM @stage")
 
 
 if __name__ == "__main__":

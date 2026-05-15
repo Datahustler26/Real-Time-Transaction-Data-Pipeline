@@ -35,6 +35,7 @@ def config():
 class TestPipelineConfig:
     """Tests for configuration management."""
 
+    @patch.dict(os.environ, {}, clear=True)
     def test_default_values(self):
         """Config should have sensible defaults."""
         cfg = PipelineConfig()
