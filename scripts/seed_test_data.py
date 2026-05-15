@@ -47,7 +47,7 @@ CITIES = {
 
 RESPONSE_CODES = {
     "approved": "00",
-    "declined": random.choice(["05", "14", "51", "54"]),
+    "declined": ["05", "14", "51", "54"],
     "pending": "00",
     "reversed": "00",
     "settled": "00",
@@ -99,6 +99,10 @@ def generate_transaction(record_id: int, base_time: datetime) -> dict:
     card_type = random.choice(CARD_TYPES)
     card_last_four = f"{random.randint(1000, 9999)}"
 
+    response_code = RESPONSE_CODES.get(status, "00")
+    if isinstance(response_code, list):
+        response_code = random.choice(response_code)
+    
     return {
         "transaction_id": f"TXN_{uuid.uuid4().hex[:12].upper()}",
         "customer_id": customer,
@@ -113,7 +117,7 @@ def generate_transaction(record_id: int, base_time: datetime) -> dict:
         "merchant_category": random.choice(MERCHANT_CATEGORIES),
         "merchant_city": city,
         "merchant_country": country,
-        "response_code": RESPONSE_CODES.get(status, "00"),
+        "response_code": response_code,
         "auth_code": f"AUTH{random.randint(100000, 999999)}" if status == "approved" else "",
     }
 

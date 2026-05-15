@@ -95,7 +95,7 @@ class DataQualityValidator:
         if column not in df.columns:
             self._add_result(name, "referential", False, f"Column '{column}' missing", 0, 1)
             return
-        vals = df[column].dropna().str.lower()
+        vals = df[column].dropna().astype(str).str.lower()
         valid_l = [v.lower() for v in valid]
         bad = (~vals.isin(valid_l)).sum()
         rate = 1 - bad / max(len(vals), 1)

@@ -65,13 +65,13 @@ def ingest_raw_data(**context):
     sf = SnowflakeManager()
     execution_date = context["execution_date"]
 
-    # Get last processed watermark
+    # Get last processed watermark for incremental load
     last_watermark = Variable.get(
         "last_processed_watermark",
-        default_var=execution_date - timedelta(hours=1),
+        default_var=str(execution_date - timedelta(hours=1)),
     )
 
-    # Copy raw data from S3 stage to Snowflake
+    # Copy raw data from S3 stage to Snowflake (files after last watermark)
     ingest_query = f"""
         COPY INTO {CONFIG.RAW_SCHEMA}.raw_transactions
         FROM @{CONFIG.RAW_SCHEMA}.transaction_stage
@@ -82,6 +82,8 @@ def ingest_raw_data(**context):
         ON_ERROR = 'CONTINUE'
         PURGE = FALSE;
     """
+    # Log watermark for audit trail
+    print(f"Using watermark: {last_watermark}")
 
     result = sf.execute_query(ingest_query)
     rows_loaded = result.get("rows_loaded", 0) if result else 0
